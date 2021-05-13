@@ -86,7 +86,7 @@ public class TestyPrihlasovaniNaKurzy {
     @Test
     public void applicationOverview() {
 
-        //choose the order of the application you want to display from the list on the website
+        //choose the order number of the application you want to display from the list on the website
         int applicationNr = ;
         String xPathOverview = "//table/tbody/tr[" + applicationNr + "]/td[5]/div/a[1]";
 
