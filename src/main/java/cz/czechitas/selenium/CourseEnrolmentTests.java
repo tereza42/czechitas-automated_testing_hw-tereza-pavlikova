@@ -10,11 +10,11 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class TestyPrihlasovaniNaKurzy {
+public class CourseEnrolmentTests {
 
     WebDriver browser;
-    String homePage = "https://cz-test-jedna.herokuapp.com/";
-    String applicationsListPage = "https://cz-test-jedna.herokuapp.com/zaci";
+    private static final String URL_HOMEPAGE = "https://cz-test-jedna.herokuapp.com/";
+    private static final String URL_APPLICATIONS_LIST = "https://cz-test-jedna.herokuapp.com/zaci";
 
 
     @BeforeEach
@@ -26,21 +26,20 @@ public class TestyPrihlasovaniNaKurzy {
 
     @Test
     public void userShouldBeAbleToLogIn() {
-        browser.navigate().to(homePage);
+        browser.navigate().to(URL_HOMEPAGE);
         clickOnLoginButton();
         logIn();
 
-        Assertions.assertEquals(browser.getCurrentUrl(), applicationsListPage);
+        Assertions.assertEquals(browser.getCurrentUrl(), URL_APPLICATIONS_LIST);
     }
 
     @Test
     public void loggedInUserShouldBeAbleToCreateApplication() {
-
         String childForename = "Annie";
         String childSurname = "Czechita" + System.currentTimeMillis();
         String xPath = "//td[contains(text(), '" + childForename + " " + childSurname + "')]";
 
-        browser.navigate().to(homePage);
+        browser.navigate().to(URL_HOMEPAGE);
         List <WebElement> coursesMoreInfoButtons = browser.findElements(By.xpath("//a[contains(text(), 'Více informací')]"));
         WebElement htmlMoreInfo = coursesMoreInfoButtons.get(1);
         htmlMoreInfo.click();
@@ -48,21 +47,20 @@ public class TestyPrihlasovaniNaKurzy {
         moreInfoHTML.click();
 
         logIn();
-        htmlCourseApplication(childForename, childSurname);
+        createHtmlCourseApplication(childForename, childSurname);
 
-        browser.navigate().to(applicationsListPage);
+        browser.navigate().to(URL_APPLICATIONS_LIST);
         WebElement childIsSignedUp = browser.findElement(By.xpath(xPath));
         Assertions.assertNotNull(childIsSignedUp);
     }
 
     @Test
     public void userShouldBeAbleToSelectCourseThenLogIn() {
-
         String childForename2 = "Susie";
         String childSurname2 = "Czechita" + System.currentTimeMillis();
         String xPath2 = "//td[contains(text(), '" + childForename2 + " " + childSurname2 + "')]";
 
-        browser.navigate().to(homePage);
+        browser.navigate().to(URL_HOMEPAGE);
         clickOnLoginButton();
 
         logIn();
@@ -75,20 +73,19 @@ public class TestyPrihlasovaniNaKurzy {
         WebElement moreInfoHTML = browser.findElement(By.xpath("/html/body/div/div//a"));
         moreInfoHTML.click();
 
-        htmlCourseApplication(childForename2, childSurname2);
+        createHtmlCourseApplication(childForename2, childSurname2);
 
-        browser.navigate().to(applicationsListPage);
+        browser.navigate().to(URL_APPLICATIONS_LIST);
         WebElement childIsSignedUp2 = browser.findElement(By.xpath(xPath2));
         Assertions.assertNotNull(childIsSignedUp2);
     }
 
     @Test
     public void userShouldBeAbleToViewExistingApplication() {
-
         int applicationNrFromOverview = 4;
         String xPathOverview = "//table/tbody/tr[" + applicationNrFromOverview + "]/td[5]/div/a[1]";
 
-        browser.navigate().to(homePage);
+        browser.navigate().to(URL_HOMEPAGE);
         clickOnLoginButton();
 
         logIn();
@@ -104,6 +101,7 @@ public class TestyPrihlasovaniNaKurzy {
     public void tearDown() {
         browser.close();
     }
+
     public void clickOnLoginButton() {
         WebElement logInButton = browser.findElement(By.xpath("//*[text()='Přihlásit                ']"));
         logInButton.click();
@@ -118,8 +116,7 @@ public class TestyPrihlasovaniNaKurzy {
         logInSubmit.click();
     }
 
-    public void htmlCourseApplication(String forename, String surname) {
-
+    public void createHtmlCourseApplication(String forename, String surname) {
         WebElement chooseCourseTerm = browser.findElement(By.xpath("//div[contains(text(), 'Vyberte termín...')]"));
         chooseCourseTerm.click();
         WebElement chosenTerm = browser.findElement(By.xpath("//li/a/span[@class='text']"));
