@@ -13,86 +13,83 @@ import java.util.concurrent.TimeUnit;
 public class TestyPrihlasovaniNaKurzy {
 
     WebDriver browser;
+    String homePage = "https://cz-test-jedna.herokuapp.com/";
+    String applicationsListPage = "https://cz-test-jedna.herokuapp.com/zaci";
+
 
     @BeforeEach
     public void setUp() {
-//      System.setProperty("webdriver.gecko.driver", System.getProperty("user.home") + "/Java-Training/Selenium/geckodriver");
         System.setProperty("webdriver.gecko.driver", "C:\\Java-Training\\Selenium\\geckodriver.exe");
         browser = new FirefoxDriver();
         browser.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
     @Test
-    public void appLogIn() {
-        browser.navigate().to("https://cz-test-jedna.herokuapp.com/");
-        WebElement logInButton = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/prihlaseni']"));
-        logInButton.click();
-
+    public void userShouldBeAbleToLogIn() {
+        browser.navigate().to(homePage);
+        clickOnLoginButton();
         logIn();
 
-        Assertions.assertEquals(browser.getCurrentUrl(), "https://cz-test-jedna.herokuapp.com/zaci");
+        Assertions.assertEquals(browser.getCurrentUrl(), applicationsListPage);
     }
 
     @Test
-    public void courseApplication() {
+    public void loggedInUserShouldBeAbleToCreateApplication() {
 
-        //choose the child's first name and surname
-        String childForename = "";
-        String childSurname = "";
+        String childForename = "Annie";
+        String childSurname = "Czechita" + System.currentTimeMillis();
         String xPath = "//td[contains(text(), '" + childForename + " " + childSurname + "')]";
 
-        browser.navigate().to("https://cz-test-jedna.herokuapp.com/");
-        WebElement webCoursesButton = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/11-trimesicni-kurzy-webu']"));
-        webCoursesButton.click();
-        WebElement moreInfoHTML = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/zaci/pridat/41-html-1']"));
+        browser.navigate().to(homePage);
+        List <WebElement> coursesMoreInfoButtons = browser.findElements(By.xpath("//a[contains(text(), 'Více informací')]"));
+        WebElement htmlMoreInfo = coursesMoreInfoButtons.get(1);
+        htmlMoreInfo.click();
+        WebElement moreInfoHTML = browser.findElement(By.xpath("/html/body/div/div//a"));
         moreInfoHTML.click();
 
         logIn();
-
         htmlCourseApplication(childForename, childSurname);
 
-        browser.navigate().to("https://cz-test-jedna.herokuapp.com/zaci/");
+        browser.navigate().to(applicationsListPage);
         WebElement childIsSignedUp = browser.findElement(By.xpath(xPath));
+        Assertions.assertNotNull(childIsSignedUp);
     }
 
     @Test
-    public void courseApplication2() {
+    public void userShouldBeAbleToSelectCourseThenLogIn() {
 
-        //choose the child's first name and surname
-        String childForename2 = "";
-        String childSurname2 = "";
+        String childForename2 = "Susie";
+        String childSurname2 = "Czechita" + System.currentTimeMillis();
         String xPath2 = "//td[contains(text(), '" + childForename2 + " " + childSurname2 + "')]";
 
-        browser.navigate().to("https://cz-test-jedna.herokuapp.com/");
-        WebElement logInButton = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/prihlaseni']"));
-        logInButton.click();
+        browser.navigate().to(homePage);
+        clickOnLoginButton();
 
         logIn();
 
-        WebElement newApplication = browser.findElement(By.xpath("/html/body/div/div/div/div/div/div[1]/a"));
+        WebElement newApplication = browser.findElement(By.xpath("//*[text()='Vytvořit novou přihlášku']"));
         newApplication.click();
-        WebElement moreInfoHTML = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/11-trimesicni-kurzy-webu']"));
+        List <WebElement> coursesMoreInfoButtons = browser.findElements(By.xpath("//a[contains(text(), 'Více informací')]"));
+        WebElement htmlMoreInfo = coursesMoreInfoButtons.get(1);
+        htmlMoreInfo.click();
+        WebElement moreInfoHTML = browser.findElement(By.xpath("/html/body/div/div//a"));
         moreInfoHTML.click();
-        WebElement htmlApply = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/zaci/pridat/41-html-1']"));
-        htmlApply.click();
 
         htmlCourseApplication(childForename2, childSurname2);
 
-        browser.navigate().to("https://cz-test-jedna.herokuapp.com/zaci/");
+        browser.navigate().to(applicationsListPage);
         WebElement childIsSignedUp2 = browser.findElement(By.xpath(xPath2));
-
+        Assertions.assertNotNull(childIsSignedUp2);
     }
 
     @Test
-    public void applicationOverview() {
+    public void userShouldBeAbleToViewExistingApplication() {
 
-        //choose the order number of the application you want to display from the list on the website
-        int applicationNr = ;
-        String xPathOverview = "//table/tbody/tr[" + applicationNr + "]/td[5]/div/a[1]";
+        int applicationNrFromOverview = 4;
+        String xPathOverview = "//table/tbody/tr[" + applicationNrFromOverview + "]/td[5]/div/a[1]";
 
-        browser.navigate().to("https://cz-test-jedna.herokuapp.com/");
-        WebElement logInButton = browser.findElement(By.xpath("//div/a[@href='https://cz-test-jedna.herokuapp.com/prihlaseni']"));
-        logInButton.click();
+        browser.navigate().to(homePage);
+        clickOnLoginButton();
 
         logIn();
 
@@ -101,12 +98,15 @@ public class TestyPrihlasovaniNaKurzy {
 
         List<WebElement> participantDetails = browser.findElements(By.xpath("//tbody/tr/td[contains(text(), 'Detaily žáka')]"));
         Assertions.assertTrue(participantDetails.size() > 0);
-
     }
 
     @AfterEach
     public void tearDown() {
         browser.close();
+    }
+    public void clickOnLoginButton() {
+        WebElement logInButton = browser.findElement(By.xpath("//*[text()='Přihlásit                ']"));
+        logInButton.click();
     }
 
     public void logIn() {
